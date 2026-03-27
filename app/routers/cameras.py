@@ -47,8 +47,11 @@ def create_camera(
     db: Session = Depends(get_db),
     _user: User = Depends(get_admin_user),
 ):
-    """カメラ作成（admin専用）"""
-    camera = Camera(company_id=company_id, name=req.name)
+    """カメラ作成（admin専用）。camera_keyはデバイスに書き込み済みのものを入力。"""
+    existing = db.query(Camera).filter(Camera.camera_key == req.camera_key).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="このCamera Keyは既に登録されています")
+    camera = Camera(company_id=company_id, name=req.name, camera_key=req.camera_key)
     db.add(camera)
     db.commit()
     db.refresh(camera)

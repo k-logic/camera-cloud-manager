@@ -5,6 +5,7 @@ from pydantic import BaseModel, field_validator
 # --- Camera ---
 class CameraCreate(BaseModel):
     name: str
+    camera_key: str
 
 
 class CameraUpdate(BaseModel):

@@ -1,4 +1,3 @@
-import secrets
 from datetime import datetime, timezone
 from sqlalchemy import Integer, String, Boolean, DateTime, Float, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -13,7 +12,7 @@ class Camera(Base):
     company_id: Mapped[int] = mapped_column(Integer, ForeignKey("companies.id"), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     camera_key: Mapped[str] = mapped_column(
-        String(32), nullable=False, unique=True, default=lambda: secrets.token_urlsafe(16)
+        String(32), nullable=False, unique=True
     )
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     pending_command: Mapped[str | None] = mapped_column(String(50), nullable=True)
