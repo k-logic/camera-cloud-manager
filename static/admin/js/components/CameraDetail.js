@@ -71,9 +71,6 @@ const CameraDetail = {
             <button class="btn btn-secondary btn-sm" @click="streamControl(false)" :disabled="!settings.stream_running">
               <i class="bi bi-stop-fill me-1"></i>Stop
             </button>
-            <button class="btn btn-danger btn-sm" @click="reboot">
-              <i class="bi bi-arrow-clockwise me-1"></i>Reboot
-            </button>
           </div>
         </div>
       </div>
@@ -249,21 +246,6 @@ const CameraDetail = {
         const updated = await res.json();
         this.settings = updated;
         this.controlMsg = start ? "Start command issued" : "Stop command issued";
-        this.controlMsgType = "ok";
-      } else {
-        const data = await res.json();
-        this.controlMsg = data.detail || "Error";
-        this.controlMsgType = "error";
-      }
-    },
-    async reboot() {
-      if (!confirm("Reboot this camera?")) return;
-      this.controlMsg = null;
-      const res = await apiFetch(`/api/cameras/${this.$route.params.id}/reboot`, {
-        method: "POST",
-      });
-      if (res.ok) {
-        this.controlMsg = "Reboot command issued";
         this.controlMsgType = "ok";
       } else {
         const data = await res.json();

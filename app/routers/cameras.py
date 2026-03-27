@@ -178,29 +178,6 @@ def update_camera_settings(
 # 配信制御
 # ============================
 
-@router.post("/cameras/{camera_id}/reboot", response_model=CommandLogResponse)
-def reboot_camera(
-    camera_id: int,
-    db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
-):
-    """Rebootコマンド発行"""
-    camera = db.query(Camera).filter(Camera.id == camera_id).first()
-    if not camera:
-        raise HTTPException(status_code=404, detail="Camera not found")
-    if not user.is_admin and user.company_id != camera.company_id:
-        raise HTTPException(status_code=403, detail="Access denied")
-
-    camera.pending_command = "reboot"
-    log = CommandLog(camera_id=camera.id, command="reboot", issued_by=user.id)
-    db.add(log)
-    db.commit()
-    db.refresh(log)
-
-    mqtt_service.publish_command(camera.camera_key, "reboot")
-
-    return log
-
 
 @router.get("/cameras/{camera_id}/commands", response_model=list[CommandLogResponse])
 def get_command_logs(
