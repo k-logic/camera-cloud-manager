@@ -1,5 +1,5 @@
 const { createApp, computed } = Vue;
-const { createRouter, createWebHashHistory } = VueRouter;
+const { createRouter, createWebHistory } = VueRouter;
 
 const routes = [
   { path: "/login", component: Login },
@@ -12,7 +12,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
 });
 
