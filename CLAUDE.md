@@ -99,6 +99,5 @@ python3 ~/jetson_client.py --camera-key <KEY> --broker <CLOUD_IP>
 - jetson_client.py変更後はJetsonへscp忘れに注意
 
 ## 関連リポジトリ
-- Jetson側: <INTERNAL_REPO>（タグ: v1.0, v2.0）
-- Jetson SSH: `ssh <JETSON_HOST>`（鍵: <SSH_KEY_PATH>）
-- Jetson camera-api: ~/vr180-live-encoder/camera-api/（FastAPI :8000）
+- Jetson側: 別リポジトリ（vr180-live-encoder）
+- Jetson camera-api: FastAPI :8000
