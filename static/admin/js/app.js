@@ -22,6 +22,14 @@ router.beforeEach((to) => {
   }
 });
 
+router.afterEach(() => {
+  const el = document.getElementById("sidebar");
+  if (el) {
+    const offcanvas = bootstrap.Offcanvas.getInstance(el);
+    if (offcanvas) offcanvas.hide();
+  }
+});
+
 const app = createApp({
   setup() {
     const isLoggedIn = computed(() => auth.isLoggedIn);
