@@ -112,6 +112,14 @@ def publish_settings(camera_key: str, settings):
     logger.info(f"Published settings to cameras/{camera_key}/settings")
 
 
+def clear_retained(camera_key: str):
+    """Retained Messageをクリア（カメラ削除時）"""
+    if not _client:
+        return
+    _client.publish(f"cameras/{camera_key}/settings", "", retain=True)
+    logger.info(f"Cleared retained message for cameras/{camera_key}/settings")
+
+
 def publish_command(camera_key: str, command: str):
     """コマンドを配信（非Retained）"""
     if not _client:

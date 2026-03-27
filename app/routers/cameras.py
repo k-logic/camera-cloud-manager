@@ -107,6 +107,7 @@ def delete_camera(
     camera = db.query(Camera).filter(Camera.id == camera_id).first()
     if not camera:
         raise HTTPException(status_code=404, detail="Camera not found")
+    mqtt_service.clear_retained(camera.camera_key)
     db.delete(camera)
     db.commit()
 
