@@ -51,7 +51,7 @@ python3 ~/jetson_client.py --camera-key <KEY> --broker 192.168.0.121
 - 共有バックエンド + 分離フロントエンド（admin/client）
 - Admin（運営会社）: 全企業・全カメラ管理、設定変更
 - Client（クライアント企業）: 自社カメラの閲覧・操作
-- 本番では `admin.example.com` / `app.example.com` でサブドメイン分離
+- 本番では `camera-admin.evoxr.jp` / `camera-app.evoxr.jp` でサブドメイン分離
 - Desired State方式: クラウドは「あるべき状態」を設定、カメラが自律的に反映
 - jetson_client.py は既存camera-apiのHTTPエンドポイントを呼ぶだけ（camera-apiのコード変更不要）
 
@@ -69,9 +69,8 @@ python3 ~/jetson_client.py --camera-key <KEY> --broker 192.168.0.121
 - command_logs: 操作履歴（command, issued_by, issued_at）
 
 ## MQTT設計
-- トピック: `cameras/{camera_key}/status|settings|command`
+- トピック: `cameras/{camera_key}/status|settings`
 - settings は Retained Message（カメラ再接続時に最新設定を即取得）
-- command は非Retained（reboot等の一回きり）
 - Mosquitto設定: `/opt/homebrew/etc/mosquitto/mosquitto.conf`
   - `listener 1883 0.0.0.0` + `allow_anonymous true`
 
@@ -86,12 +85,25 @@ python3 ~/jetson_client.py --camera-key <KEY> --broker 192.168.0.121
 | `static/admin/js/components/CameraDetail.js` | Admin UI カメラ詳細 |
 | `static/client/js/components/CameraDetail.js` | Client UI カメラ詳細 |
 
+## Docker構成
+- 設定ファイルはdev/prodで分離、`docker-compose.yml`は使う方をコピー（gitignore）
+  - `docker-compose.dev.yml` → `.env.dev` + `nginx/nginx.dev.conf` を参照
+  - `docker-compose.prod.yml` → `.env.prod` + `nginx/nginx.prod.conf` を参照
+- ローカル: `cp docker-compose.dev.yml docker-compose.yml && docker compose up --build`
+- 本番: `cp docker-compose.prod.yml docker-compose.yml && docker compose up --build -d`
+
+## UI
+- Bootstrap 5 + サイドバーダッシュボードレイアウト
+- デスクトップ: 左250pxダークサイドバー + 右メインコンテンツ
+- スマホ: ハンバーガーメニュー + Bootstrap offcanvas
+
 ## 実装フェーズ
 - Phase 1: 基盤（認証 + 企業 + ユーザー） ✅
 - Phase 2: カメラ管理（CRUD + 設定 + UI） ✅
 - Phase 3: 配信制御（Desired State + command_logs） ✅
 - Phase 4: ポーリング + ステータス監視 ✅
 - Phase 5: MQTT移行 + Jetson実機接続 ✅
+- Phase 6: Bootstrap 5 UIリニューアル + 本番デプロイ ✅
 
 ## 既知の問題
 - passlib + bcrypt 5.x非互換: bcrypt==4.1.3にピン留め（警告は出るが動作OK）
