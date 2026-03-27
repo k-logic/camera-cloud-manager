@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Console - Camera Cloud Manager</title>
+  <link rel="stylesheet" href="/admin/css/style.css">
+</head>
+<body>
+  <div id="app">
+    <header v-if="isLoggedIn" class="app-header">
+      <h1 class="app-title">Admin Console</h1>
+      <nav class="app-nav">
+        <router-link to="/">Dashboard</router-link>
+        <router-link to="/companies">Companies</router-link>
+      </nav>
+      <div class="app-user">
+        <span>{{ username }}</span>
+        <button @click="logout" class="btn btn-sm">Logout</button>
+      </div>
+    </header>
+    <main class="app-main">
+      <router-view></router-view>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.prod.js"></script>
+  <script src="/admin/js/stores/auth.js"></script>
+  <script src="/admin/js/api.js"></script>
+  <script src="/admin/js/components/Login.js"></script>
+  <script src="/admin/js/components/Dashboard.js"></script>
+  <script src="/admin/js/components/CompanyList.js"></script>
+  <script src="/admin/js/components/CompanyForm.js"></script>
+  <script src="/admin/js/components/CameraList.js"></script>
+  <script src="/admin/js/components/CameraDetail.js"></script>
+  <script src="/admin/js/app.js"></script>
+</body>
+</html>
