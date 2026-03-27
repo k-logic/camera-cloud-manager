@@ -27,7 +27,7 @@ const CompanyForm = {
   },
   async created() {
     if (this.isEdit) {
-      const res = await apiFetch(\`/api/companies/\${this.$route.params.id}\`);
+      const res = await apiFetch(`/api/companies/${this.$route.params.id}`);
       if (res.ok) this.form = await res.json();
     }
   },
@@ -35,7 +35,7 @@ const CompanyForm = {
     async submit() {
       this.error = null;
       const url = this.isEdit
-        ? \`/api/companies/\${this.$route.params.id}\`
+        ? `/api/companies/${this.$route.params.id}`
         : "/api/companies";
       const method = this.isEdit ? "PUT" : "POST";
       const res = await apiFetch(url, {

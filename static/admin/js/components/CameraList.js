@@ -94,9 +94,9 @@ const CameraList = {
   },
   methods: {
     async load() {
-      const res = await apiFetch(\`/api/companies/\${this.companyId}/cameras\`);
+      const res = await apiFetch(`/api/companies/${this.companyId}/cameras`);
       if (res.ok) this.cameras = await res.json();
-      const cres = await apiFetch(\`/api/companies/\${this.companyId}\`);
+      const cres = await apiFetch(`/api/companies/${this.companyId}`);
       if (cres.ok) {
         const company = await cres.json();
         this.companyName = company.name;
@@ -109,7 +109,7 @@ const CameraList = {
     },
     async create() {
       this.createError = null;
-      const res = await apiFetch(\`/api/companies/\${this.companyId}/cameras\`, {
+      const res = await apiFetch(`/api/companies/${this.companyId}/cameras`, {
         method: "POST",
         body: JSON.stringify({ name: this.newName }),
       });
@@ -122,15 +122,15 @@ const CameraList = {
       }
     },
     async toggleActive(c) {
-      await apiFetch(\`/api/cameras/\${c.id}\`, {
+      await apiFetch(`/api/cameras/${c.id}`, {
         method: "PUT",
         body: JSON.stringify({ is_active: !c.is_active }),
       });
       await this.load();
     },
     async remove(c) {
-      if (!confirm(\`Delete camera "\${c.name}"?\`)) return;
-      const res = await apiFetch(\`/api/cameras/\${c.id}\`, { method: "DELETE" });
+      if (!confirm(`Delete camera "${c.name}"?`)) return;
+      const res = await apiFetch(`/api/cameras/${c.id}`, { method: "DELETE" });
       if (res.ok) await this.load();
     },
   },

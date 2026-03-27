@@ -39,7 +39,7 @@ const CameraList = {
   },
   methods: {
     async load() {
-      const res = await apiFetch(\`/api/companies/\${auth.companyId}/cameras\`);
+      const res = await apiFetch(`/api/companies/${auth.companyId}/cameras`);
       if (res.ok) this.cameras = await res.json();
     },
   },

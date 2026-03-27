@@ -192,7 +192,7 @@ const CameraDetail = {
   },
   methods: {
     async refreshStatus() {
-      const res = await apiFetch(\`/api/cameras/\${this.$route.params.id}\`);
+      const res = await apiFetch(`/api/cameras/${this.$route.params.id}`);
       if (res.ok) {
         const data = await res.json();
         this.camera.status = data.status;
@@ -213,7 +213,7 @@ const CameraDetail = {
     },
     async saveName() {
       if (!this.editName.trim()) return;
-      const res = await apiFetch(\`/api/cameras/\${this.camera.id}\`, {
+      const res = await apiFetch(`/api/cameras/${this.camera.id}`, {
         method: "PUT",
         body: JSON.stringify({ name: this.editName.trim() }),
       });
@@ -223,15 +223,15 @@ const CameraDetail = {
       }
     },
     async load() {
-      const res = await apiFetch(\`/api/cameras/\${this.$route.params.id}\`);
+      const res = await apiFetch(`/api/cameras/${this.$route.params.id}`);
       if (res.ok) {
         this.camera = await res.json();
         if (this.camera.settings) {
           this.settings = this.camera.settings;
           this.settingsForm = {
             camera_source: this.settings.camera_source || "mipi",
-            capture_resolution: \`\${this.settings.width}x\${this.settings.height}\`,
-            output_resolution: \`\${this.settings.output_width}x\${this.settings.output_height}\`,
+            capture_resolution: `${this.settings.width}x${this.settings.height}`,
+            output_resolution: `${this.settings.output_width}x${this.settings.output_height}`,
             fps: this.settings.fps,
             bitrate: this.settings.bitrate,
             stream_url: this.settings.stream_url || "",
@@ -241,7 +241,7 @@ const CameraDetail = {
     },
     async streamControl(start) {
       this.controlMsg = null;
-      const res = await apiFetch(\`/api/cameras/\${this.$route.params.id}/settings\`, {
+      const res = await apiFetch(`/api/cameras/${this.$route.params.id}/settings`, {
         method: "PUT",
         body: JSON.stringify({ stream_running: start }),
       });
@@ -259,7 +259,7 @@ const CameraDetail = {
     async reboot() {
       if (!confirm("Reboot this camera?")) return;
       this.controlMsg = null;
-      const res = await apiFetch(\`/api/cameras/\${this.$route.params.id}/reboot\`, {
+      const res = await apiFetch(`/api/cameras/${this.$route.params.id}/reboot`, {
         method: "POST",
       });
       if (res.ok) {
@@ -285,14 +285,14 @@ const CameraDetail = {
         bitrate: this.settingsForm.bitrate,
         stream_url: this.settingsForm.stream_url || null,
       };
-      const res = await apiFetch(\`/api/cameras/\${this.$route.params.id}/settings\`, {
+      const res = await apiFetch(`/api/cameras/${this.$route.params.id}/settings`, {
         method: "PUT",
         body: JSON.stringify(body),
       });
       if (res.ok) {
         const updated = await res.json();
         this.settings = updated;
-        this.settingsMsg = \`Settings saved (v\${updated.settings_version})\`;
+        this.settingsMsg = `Settings saved (v${updated.settings_version})`;
         this.settingsMsgType = "ok";
       } else {
         const data = await res.json();
@@ -307,7 +307,7 @@ const CameraDetail = {
     formatUptime(seconds) {
       const h = Math.floor(seconds / 3600);
       const m = Math.floor((seconds % 3600) / 60);
-      return \`\${h}h \${m}m\`;
+      return `${h}h ${m}m`;
     },
   },
 };

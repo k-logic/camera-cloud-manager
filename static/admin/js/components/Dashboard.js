@@ -40,7 +40,7 @@ const Dashboard = {
       const companies = await res.json();
       let totalCameras = 0;
       for (const c of companies) {
-        const cres = await apiFetch(\`/api/companies/\${c.id}/cameras\`);
+        const cres = await apiFetch(`/api/companies/${c.id}/cameras`);
         if (cres.ok) {
           const cameras = await cres.json();
           totalCameras += cameras.length;

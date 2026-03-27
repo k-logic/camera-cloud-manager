@@ -46,8 +46,8 @@ const CompanyList = {
       if (res.ok) this.companies = await res.json();
     },
     async remove(c) {
-      if (!confirm(\`Delete "\${c.name}"?\`)) return;
-      const res = await apiFetch(\`/api/companies/\${c.id}\`, { method: "DELETE" });
+      if (!confirm(`Delete "${c.name}"?`)) return;
+      const res = await apiFetch(`/api/companies/${c.id}`, { method: "DELETE" });
       if (res.ok) await this.load();
     },
   },
