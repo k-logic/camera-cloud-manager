@@ -17,6 +17,7 @@ Example:
 import argparse
 import json
 import os
+import ssl
 import time
 import urllib.request
 import urllib.error
@@ -155,8 +156,10 @@ def main():
     parser = argparse.ArgumentParser(description="Jetson MQTT camera client")
     parser.add_argument("--camera-key", required=True)
     parser.add_argument("--broker", required=True, help="MQTT broker IP")
-    parser.add_argument("--port", type=int, default=80)
+    parser.add_argument("--port", type=int, default=443)
     parser.add_argument("--ws-path", default="/mqtt", help="WebSocket path")
+    parser.add_argument("--ssl", action="store_true", default=True, help="Use SSL (default: True)")
+    parser.add_argument("--no-ssl", dest="ssl", action="store_false", help="Disable SSL")
     parser.add_argument("--api-url", default=CAMERA_API, help="camera-api URL")
     args = parser.parse_args()
 
@@ -218,11 +221,14 @@ def main():
 
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, transport="websockets")
     client.ws_set_options(path=args.ws_path)
+    if args.ssl:
+        client.tls_set(cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLS_CLIENT)
     client.on_connect = on_connect
     client.on_message = on_message
 
+    proto = "wss" if args.ssl else "ws"
     print(f"[Jetson] Camera Key: {camera_key}")
-    print(f"[Jetson] Broker: ws://{args.broker}:{args.port}{args.ws_path}")
+    print(f"[Jetson] Broker: {proto}://{args.broker}:{args.port}{args.ws_path}")
     print(f"[Jetson] Camera API: {CAMERA_API}")
 
     client.connect(args.broker, args.port)

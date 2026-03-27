@@ -4,26 +4,63 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Camera Cloud Manager</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/client/css/style.css">
 </head>
 <body>
   <div id="app">
-    <header v-if="isLoggedIn" class="app-header">
-      <h1 class="app-title">Camera Cloud Manager</h1>
-      <nav class="app-nav">
-        <router-link to="/">Dashboard</router-link>
-        <router-link to="/">Cameras</router-link>
+    <!-- Login (no sidebar) -->
+    <router-view v-if="!isLoggedIn"></router-view>
+
+    <!-- Dashboard layout -->
+    <div v-else class="d-flex">
+      <!-- Mobile navbar -->
+      <nav class="navbar navbar-dark bg-dark d-md-none fixed-top">
+        <div class="container-fluid">
+          <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+            <i class="bi bi-list fs-4"></i>
+          </button>
+          <span class="navbar-brand mb-0">Camera Cloud</span>
+          <div></div>
+        </div>
       </nav>
-      <div class="app-user">
-        <span>{{ username }}</span>
-        <button @click="logout" class="btn btn-sm">Logout</button>
+
+      <!-- Sidebar -->
+      <div class="offcanvas-md offcanvas-start sidebar" id="sidebar" tabindex="-1">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Camera Cloud</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column p-0">
+          <div class="sidebar-brand d-none d-md-block">
+            <i class="bi bi-camera-video me-2"></i>Camera Cloud
+          </div>
+          <hr class="sidebar-divider d-none d-md-block">
+          <nav class="nav flex-column sidebar-nav flex-grow-1">
+            <router-link to="/" class="nav-link sidebar-link">
+              <i class="bi bi-speedometer2 me-2"></i>Dashboard
+            </router-link>
+          </nav>
+          <hr class="sidebar-divider">
+          <div class="sidebar-footer">
+            <i class="bi bi-person-circle me-1"></i>
+            <small>{{ username }}</small>
+            <button @click="logout" class="btn btn-outline-light btn-sm w-100 mt-2">
+              <i class="bi bi-box-arrow-left me-1"></i>Logout
+            </button>
+          </div>
+        </div>
       </div>
-    </header>
-    <main class="app-main">
-      <router-view></router-view>
-    </main>
+
+      <!-- Main content -->
+      <main class="main-content flex-grow-1">
+        <router-view></router-view>
+      </main>
+    </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.prod.js"></script>
   <script src="/client/js/stores/auth.js"></script>

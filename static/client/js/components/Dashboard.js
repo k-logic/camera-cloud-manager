@@ -1,38 +1,40 @@
 const Dashboard = {
   template: `
     <div>
-      <h2 style="margin-bottom:16px">Dashboard</h2>
-      <div class="card" style="margin-bottom:16px">
-        <p>Welcome, {{ username }}.</p>
+      <h4 class="mb-4">Dashboard</h4>
+      <div class="card mb-4">
+        <div class="card-body">
+          <p class="mb-0">Welcome, <strong>{{ username }}</strong>.</p>
+        </div>
       </div>
 
-      <div class="card-header">
-        <h2>Cameras</h2>
-      </div>
+      <h5 class="mb-3">Cameras</h5>
       <div class="card">
-        <table v-if="cameras.length">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Status</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="c in cameras" :key="c.id">
-              <td>{{ c.name }}</td>
-              <td>
-                <span class="status-badge" :class="c.is_active ? 'status-active' : 'status-inactive'">
-                  {{ c.is_active ? "Active" : "Inactive" }}
-                </span>
-              </td>
-              <td>
-                <router-link :to="'/cameras/' + c.id" class="btn btn-sm">Detail</router-link>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p v-else style="color:#999">No cameras registered.</p>
+        <div class="table-responsive">
+          <table v-if="cameras.length" class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="c in cameras" :key="c.id">
+                <td>{{ c.name }}</td>
+                <td>
+                  <span class="badge" :class="c.is_active ? 'bg-success' : 'bg-danger'">
+                    {{ c.is_active ? "Active" : "Inactive" }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <router-link :to="'/cameras/' + c.id" class="btn btn-sm btn-primary">Detail</router-link>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-if="!cameras.length" class="card-body text-muted">No cameras registered.</div>
       </div>
     </div>
   `,
@@ -44,7 +46,7 @@ const Dashboard = {
     return { username };
   },
   async created() {
-    const res = await apiFetch(`/api/companies/${auth.companyId}/cameras`);
+    const res = await apiFetch(\`/api/companies/\${auth.companyId}/cameras\`);
     if (res.ok) this.cameras = await res.json();
   },
 };

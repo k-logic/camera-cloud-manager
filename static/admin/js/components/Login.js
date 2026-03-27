@@ -1,22 +1,24 @@
 const Login = {
   template: `
-    <div class="login-container">
-      <div class="login-box">
-        <h2>Admin Console</h2>
-        <p v-if="error" class="error-msg">{{ error }}</p>
-        <form @submit.prevent="submit">
-          <div class="form-group">
-            <label>Username</label>
-            <input v-model="username" type="text" autofocus>
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input v-model="password" type="password">
-          </div>
-          <button class="btn" style="width:100%" :disabled="loading">
-            {{ loading ? "Logging in..." : "Login" }}
-          </button>
-        </form>
+    <div class="d-flex vh-100 justify-content-center align-items-center bg-light">
+      <div class="card shadow-sm" style="width:100%;max-width:400px">
+        <div class="card-body p-4">
+          <h4 class="text-center mb-4">Admin Console</h4>
+          <div v-if="error" class="alert alert-danger py-2">{{ error }}</div>
+          <form @submit.prevent="submit">
+            <div class="mb-3">
+              <label class="form-label">Username</label>
+              <input v-model="username" type="text" class="form-control" autofocus>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              <input v-model="password" type="password" class="form-control">
+            </div>
+            <button class="btn btn-primary w-100" :disabled="loading">
+              {{ loading ? "Logging in..." : "Login" }}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   `,

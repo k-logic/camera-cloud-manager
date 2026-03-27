@@ -9,6 +9,7 @@ Usage:
 import argparse
 import json
 import random
+import ssl
 import time
 
 import paho.mqtt.client as mqtt
@@ -20,6 +21,7 @@ def main():
     parser.add_argument("--broker", default="localhost", help="MQTT broker host")
     parser.add_argument("--port", type=int, default=80, help="MQTT broker port")
     parser.add_argument("--ws-path", default="/mqtt", help="WebSocket path")
+    parser.add_argument("--ssl", action="store_true", default=False, help="Use SSL")
     args = parser.parse_args()
 
     camera_key = args.camera_key
@@ -95,12 +97,15 @@ def main():
 
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, transport="websockets")
     client.ws_set_options(path=args.ws_path)
+    if args.ssl:
+        client.tls_set(cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLS_CLIENT)
     client.on_connect = on_connect
     client.on_message = on_message
 
+    proto = "wss" if args.ssl else "ws"
     print(f"[Simulator] Starting MQTT camera simulator (WebSocket)")
     print(f"[Simulator] Camera Key: {camera_key}")
-    print(f"[Simulator] Broker: ws://{args.broker}:{args.port}{args.ws_path}")
+    print(f"[Simulator] Broker: {proto}://{args.broker}:{args.port}{args.ws_path}")
     print(f"[Simulator] Press Ctrl+C to stop")
     print()
 
