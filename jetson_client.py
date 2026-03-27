@@ -182,6 +182,8 @@ def main():
         nonlocal settings_version, current_settings
 
         if msg.topic == topic_settings:
+            if not msg.payload:
+                return
             data = json.loads(msg.payload.decode())
             new_version = data.get("settings_version", 0)
             if new_version <= settings_version:
@@ -205,6 +207,8 @@ def main():
             send_status(client)
 
         elif msg.topic == topic_command:
+            if not msg.payload:
+                return
             data = json.loads(msg.payload.decode())
             cmd = data.get("command")
             print(f"[Jetson] Command: {cmd}")
