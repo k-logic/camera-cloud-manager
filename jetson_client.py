@@ -12,7 +12,7 @@ Usage:
     python jetson_client.py --camera-key <KEY> --broker <CLOUD_IP>
 
 Example:
-    python jetson_client.py --camera-key <CAMERA_KEY> --broker <CLOUD_IP>
+    python jetson_client.py --camera-key ZHUWypadNaWhO4V-ymnqsg --broker 192.168.0.121
 """
 import argparse
 import json

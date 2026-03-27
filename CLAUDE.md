@@ -36,11 +36,11 @@ python -u simulate_camera.py --camera-key <KEY>
 ## Jetson実機接続
 ```bash
 # Mac → Jetson にクライアントをコピー
-scp jetson_client.py <JETSON_HOST>:~/jetson_client.py
+scp jetson_client.py logic-jetson:~/jetson_client.py
 
 # Jetson上で実行（camera-api が :8000 で起動済みであること）
 source ~/venv/bin/activate
-python3 ~/jetson_client.py --camera-key <KEY> --broker <CLOUD_IP>
+python3 ~/jetson_client.py --camera-key <KEY> --broker 192.168.0.121
 ```
 
 ## アーキテクチャ
@@ -99,5 +99,6 @@ python3 ~/jetson_client.py --camera-key <KEY> --broker <CLOUD_IP>
 - jetson_client.py変更後はJetsonへscp忘れに注意
 
 ## 関連リポジトリ
-- Jetson側: 別リポジトリ（vr180-live-encoder）
-- Jetson camera-api: FastAPI :8000
+- Jetson側: git@gitlab-ld:INV_VisionAI/vr180-live-encoder.git（タグ: v1.0, v2.0）
+- Jetson SSH: `ssh logic-jetson`（鍵: ~/.ssh/dnp-camera）
+- Jetson camera-api: ~/vr180-live-encoder/camera-api/（FastAPI :8000）
