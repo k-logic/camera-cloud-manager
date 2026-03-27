@@ -64,7 +64,7 @@ const CameraList = {
               <form @submit.prevent="create">
                 <div class="mb-3">
                   <label class="form-label">Camera Key</label>
-                  <input v-model="newKey" type="text" class="form-control font-monospace" required autofocus placeholder="デバイスに書き込み済みのキーを入力">
+                  <input v-model="newKey" type="text" class="form-control font-monospace" required autofocus>
                 </div>
                 <div class="mb-3">
                   <label class="form-label">Camera Name</label>
