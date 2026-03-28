@@ -5,6 +5,7 @@ const routes = [
   { path: "/login", component: Login },
   { path: "/", component: Dashboard },
   { path: "/cameras/:id", component: CameraDetail },
+  { path: "/:pathMatch(.*)*", component: NotFound },
 ];
 
 const router = createRouter({

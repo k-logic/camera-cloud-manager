@@ -9,6 +9,7 @@ const routes = [
   { path: "/companies/:id/edit", component: CompanyForm },
   { path: "/companies/:companyId/cameras", component: CameraList },
   { path: "/cameras/:id", component: CameraDetail },
+  { path: "/:pathMatch(.*)*", component: NotFound },
 ];
 
 const router = createRouter({
