@@ -73,7 +73,7 @@ def start_stream(settings):
         "audio_bitrate": "128k",
         "audio_sample_rate": 44100,
         "audio_channels": 1,
-        "image_overlay_1": {"enabled": False, "width": 400, "height": 100, "offset_x": 0, "offset_y": 0},
+        "image_overlay_1": {"enabled": True, "width": 1920, "height": 1080, "offset_x": 0, "offset_y": 0},
         "image_overlay_2": {"enabled": False, "width": 400, "height": 100, "offset_x": 0, "offset_y": 0},
         "image_overlay_3": {"enabled": False, "width": 400, "height": 100, "offset_x": 0, "offset_y": 0},
         "text_overlay_1": {"enabled": False, "text": "", "font_family": "Sans", "size": 24, "color": "#FFFFFF", "alignment": "center", "offset_x": 0, "offset_y": 0},
