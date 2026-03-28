@@ -163,11 +163,17 @@ const CameraDetail = {
         </div>
       </div>
     </div>
+    <div v-else-if="notFound" class="text-center py-5">
+      <h1 class="display-1 text-muted">404</h1>
+      <p class="lead text-muted">Camera not found</p>
+      <router-link to="/companies" class="btn btn-primary">Back to Companies</router-link>
+    </div>
     <div v-else class="card"><div class="card-body">Loading...</div></div>
   `,
   data() {
     return {
       camera: null,
+      notFound: false,
       settings: {},
       settingsForm: { camera_source: "mipi", capture_resolution: "1920x1080", output_resolution: "1920x1080", fps: 30, bitrate: 4000, stream_url: "" },
       settingsMsg: null,
@@ -234,6 +240,8 @@ const CameraDetail = {
             stream_url: this.settings.stream_url || "",
           };
         }
+      } else {
+        this.notFound = true;
       }
     },
     async streamControl(start) {
