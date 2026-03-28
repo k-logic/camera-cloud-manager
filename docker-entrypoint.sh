@@ -5,9 +5,11 @@ set -e
 echo "Running Alembic migrations..."
 alembic upgrade head
 
-# 2. Seed initial data (admin user, test users, etc.)
-echo "Seeding initial data..."
-python seed.py
+# 2. Seed initial data (dev only)
+if [ "$SEED_DB" = "1" ]; then
+  echo "Seeding initial data..."
+  python seed.py
+fi
 
 # 3. Start uvicorn
 echo "Starting uvicorn..."
