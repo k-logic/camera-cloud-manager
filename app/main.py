@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from datetime import datetime, timezone, timedelta
 
 from fastapi import FastAPI
@@ -8,11 +9,29 @@ logging.basicConfig(level=logging.INFO)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.responses import FileResponse
 
 from app.database import SessionLocal
 from app.models.camera import CameraStatus
 from app.routers import auth, companies, cameras, polling
 from app.services import mqtt_service
+
+
+class SPAStaticFiles(StaticFiles):
+    """StaticFiles with SPA fallback: unknown paths return index.html."""
+
+    def __init__(self, directory: str, **kwargs):
+        self.spa_directory = directory
+        super().__init__(directory=directory, **kwargs)
+
+    async def get_response(self, path, scope):
+        try:
+            return await super().get_response(path, scope)
+        except StarletteHTTPException as ex:
+            if ex.status_code == 404:
+                return FileResponse(os.path.join(self.spa_directory, "index.html"))
+            raise
 
 app = FastAPI(title="Camera Cloud Manager")
 
@@ -65,5 +84,5 @@ def root():
     return RedirectResponse(url="/admin/")
 
 
-app.mount("/admin", StaticFiles(directory="static/admin", html=True), name="admin")
-app.mount("/client", StaticFiles(directory="static/client", html=True), name="client")
+app.mount("/admin", SPAStaticFiles(directory="static/admin", html=True), name="admin")
+app.mount("/client", SPAStaticFiles(directory="static/client", html=True), name="client")
