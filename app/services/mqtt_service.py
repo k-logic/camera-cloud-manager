@@ -1,14 +1,13 @@
 """MQTTサービス - カメラ↔クラウド通信"""
 import json
 import logging
-from datetime import datetime, timezone
 
 import paho.mqtt.client as mqtt
-from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
-from app.models.camera import Camera, CameraStatus
+from app.models.camera import Camera
 from app.config import MQTT_BROKER, MQTT_PORT
+from app.services import redis_service
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +27,7 @@ def _on_connect(client, userdata, flags, reason_code, properties):
 
 
 def _on_message(client, userdata, msg):
-    """カメラからのステータス受信 → DB更新"""
+    """カメラからのステータス受信 → Redis保存"""
     try:
         parts = msg.topic.split("/")
         if len(parts) != 3 or parts[2] != "status":
@@ -37,7 +36,7 @@ def _on_message(client, userdata, msg):
         camera_key = parts[1]
         data = json.loads(msg.payload.decode())
 
-        db: Session = SessionLocal()
+        db = SessionLocal()
         try:
             camera = db.query(Camera).filter(Camera.camera_key == camera_key).first()
             if not camera:
@@ -46,42 +45,29 @@ def _on_message(client, userdata, msg):
             if not camera.is_active:
                 return
 
-            now = datetime.now(timezone.utc)
-
-            # camera_status upsert
-            status = camera.status
-            if status is None:
-                status = CameraStatus(camera_id=camera.id)
-                db.add(status)
-
-            status.is_online = True
-            status.last_seen = now
-
-            # stream_status
+            # 全ステータス → Redis
             ss = data.get("stream_status", {})
-            status.stream_running = ss.get("running", False)
-            status.stream_fps = ss.get("fps")
-            status.stream_bitrate = ss.get("bitrate")
-            status.stream_time = ss.get("stream_time")
-            status.stream_quality = ss.get("stream_quality")
-
-            # system_status
             sys_s = data.get("system_status", {})
-            status.cpu_usage = sys_s.get("cpu_usage")
-            status.gpu_usage = sys_s.get("gpu_usage")
-            status.mem_used = sys_s.get("mem_used")
-            status.mem_total = sys_s.get("mem_total")
-            status.temperature = sys_s.get("temperature")
-            status.disk_used = sys_s.get("disk_used")
-            status.disk_total = sys_s.get("disk_total")
-            status.uptime = sys_s.get("uptime")
+            redis_service.save_status(camera.id, {
+                "stream_running": ss.get("running", False),
+                "stream_fps": ss.get("fps"),
+                "stream_bitrate": ss.get("bitrate"),
+                "stream_time": ss.get("stream_time"),
+                "stream_quality": ss.get("stream_quality"),
+                "cpu_usage": sys_s.get("cpu_usage"),
+                "gpu_usage": sys_s.get("gpu_usage"),
+                "mem_used": sys_s.get("mem_used"),
+                "mem_total": sys_s.get("mem_total"),
+                "temperature": sys_s.get("temperature"),
+                "disk_used": sys_s.get("disk_used"),
+                "disk_total": sys_s.get("disk_total"),
+                "uptime": sys_s.get("uptime"),
+            })
 
-            # pending_command があればMQTTで送信済みなのでクリア
+            # settings_version比較（DBからsettingsを読むだけ、書き込みなし）
             settings_version = data.get("settings_version", 0)
             if camera.settings and settings_version < camera.settings.settings_version:
                 publish_settings(camera_key, camera.settings)
-
-            db.commit()
         finally:
             db.close()
 

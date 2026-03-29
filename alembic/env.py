@@ -7,7 +7,7 @@ from alembic import context
 
 from app.config import DATABASE_URL
 from app.database import Base
-from app.models import Company, User, Camera, CameraSettings, CameraStatus, CommandLog
+from app.models import Company, User, Camera, CameraSettings, CommandLog
 
 config = context.config
 config.set_main_option("sqlalchemy.url", DATABASE_URL)

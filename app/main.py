@@ -1,7 +1,5 @@
-import asyncio
 import logging
 import os
-from datetime import datetime, timezone, timedelta
 
 from fastapi import FastAPI
 
@@ -12,10 +10,8 @@ from fastapi.responses import RedirectResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import FileResponse
 
-from app.database import SessionLocal
-from app.models.camera import CameraStatus
 from app.routers import auth, companies, cameras, polling
-from app.services import mqtt_service
+from app.services import mqtt_service, redis_service
 
 
 class SPAStaticFiles(StaticFiles):
@@ -49,34 +45,16 @@ app.include_router(cameras.router)
 app.include_router(polling.router)
 
 
-async def offline_checker():
-    """last_seenが10秒以上前のカメラをオフラインにする"""
-    while True:
-        await asyncio.sleep(5)
-        threshold = datetime.now(timezone.utc) - timedelta(seconds=10)
-        db = SessionLocal()
-        try:
-            stale = db.query(CameraStatus).filter(
-                CameraStatus.is_online == True,
-                CameraStatus.last_seen < threshold,
-            ).all()
-            for s in stale:
-                s.is_online = False
-            if stale:
-                db.commit()
-        finally:
-            db.close()
-
-
 @app.on_event("startup")
 async def start_background_tasks():
-    asyncio.create_task(offline_checker())
+    redis_service.start()
     mqtt_service.start()
 
 
 @app.on_event("shutdown")
 async def stop_background_tasks():
     mqtt_service.stop()
+    redis_service.stop()
 
 
 @app.get("/")

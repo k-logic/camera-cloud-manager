@@ -8,6 +8,8 @@ services:
         condition: service_healthy
       mosquitto:
         condition: service_started
+      redis:
+        condition: service_started
     env_file: .env.prod
     restart: always
 
@@ -24,6 +26,10 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: always
+
+  redis:
+    image: redis:7-alpine
     restart: always
 
   mosquitto:

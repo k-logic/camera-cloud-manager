@@ -71,26 +71,23 @@ class CameraSettingsResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# --- Status ---
+# --- Status (from Redis) ---
 class CameraStatusResponse(BaseModel):
-    is_online: bool
-    last_seen: datetime | None
-    stream_running: bool
-    stream_fps: float | None
-    stream_bitrate: int | None
-    stream_time: str | None
-    stream_quality: str | None
-    cpu_usage: float | None
-    gpu_usage: float | None
-    mem_used: int | None
-    mem_total: int | None
-    temperature: float | None
-    disk_used: float | None
-    disk_total: float | None
-    uptime: int | None
-    updated_at: datetime
-
-    model_config = {"from_attributes": True}
+    is_online: bool = False
+    last_seen: datetime | None = None
+    stream_running: bool = False
+    stream_fps: float | None = None
+    stream_bitrate: int | None = None
+    stream_time: str | None = None
+    stream_quality: str | None = None
+    cpu_usage: float | None = None
+    gpu_usage: float | None = None
+    mem_used: int | None = None
+    mem_total: int | None = None
+    temperature: float | None = None
+    disk_used: float | None = None
+    disk_total: float | None = None
+    uptime: int | None = None
 
 
 # --- Camera Detail (camera + settings + status) ---

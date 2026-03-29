@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from sqlalchemy import Integer, String, Boolean, DateTime, Float, ForeignKey
+from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -27,7 +27,6 @@ class Camera(Base):
 
     company = relationship("Company", backref="cameras")
     settings = relationship("CameraSettings", back_populates="camera", uselist=False, cascade="all, delete-orphan")
-    status = relationship("CameraStatus", back_populates="camera", uselist=False, cascade="all, delete-orphan")
     command_logs = relationship("CommandLog", back_populates="camera", cascade="all, delete-orphan")
 
 
@@ -53,35 +52,6 @@ class CameraSettings(Base):
     )
 
     camera = relationship("Camera", back_populates="settings")
-
-
-class CameraStatus(Base):
-    __tablename__ = "camera_status"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    camera_id: Mapped[int] = mapped_column(Integer, ForeignKey("cameras.id"), nullable=False, unique=True)
-    is_online: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    last_seen: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    stream_running: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    stream_fps: Mapped[float | None] = mapped_column(Float, nullable=True)
-    stream_bitrate: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    stream_time: Mapped[str | None] = mapped_column(String(20), nullable=True)
-    stream_quality: Mapped[str | None] = mapped_column(String(20), nullable=True)
-    cpu_usage: Mapped[float | None] = mapped_column(Float, nullable=True)
-    gpu_usage: Mapped[float | None] = mapped_column(Float, nullable=True)
-    mem_used: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    mem_total: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    temperature: Mapped[float | None] = mapped_column(Float, nullable=True)
-    disk_used: Mapped[float | None] = mapped_column(Float, nullable=True)
-    disk_total: Mapped[float | None] = mapped_column(Float, nullable=True)
-    uptime: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False,
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
-    )
-
-    camera = relationship("Camera", back_populates="status")
 
 
 class CommandLog(Base):

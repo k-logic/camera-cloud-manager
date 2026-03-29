@@ -5,10 +5,11 @@ from app.dependencies import get_db, get_admin_user, get_current_user
 from app.models.user import User
 from app.models.company import Company
 from app.models.camera import Camera, CameraSettings, CommandLog
-from app.services import mqtt_service
+from app.services import mqtt_service, redis_service
 from app.schemas.camera import (
     CameraCreate, CameraUpdate, CameraResponse, CameraListItem,
     CameraSettingsUpdate, CameraSettingsResponse, CameraDetailResponse,
+    CameraStatusResponse,
     CommandLogResponse,
 )
 
@@ -68,13 +69,52 @@ def get_camera(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """カメラ詳細（設定・ステータス込み）"""
+    """カメラ詳細（設定・ステータス込み）。ステータスはRedisから取得。"""
     camera = db.query(Camera).filter(Camera.id == camera_id).first()
     if not camera:
         raise HTTPException(status_code=404, detail="Camera not found")
     if not user.is_admin and user.company_id != camera.company_id:
         raise HTTPException(status_code=403, detail="Access denied")
-    return camera
+
+    # ステータスはRedisから取得（キーなし=オフライン）
+    redis_data = redis_service.get_status(camera_id)
+    if redis_data:
+        status_response = CameraStatusResponse(
+            is_online=True,
+            last_seen=redis_data.get("last_seen"),
+            stream_running=redis_data.get("stream_running", False),
+            stream_fps=redis_data.get("stream_fps"),
+            stream_bitrate=redis_data.get("stream_bitrate"),
+            stream_time=redis_data.get("stream_time"),
+            stream_quality=redis_data.get("stream_quality"),
+            cpu_usage=redis_data.get("cpu_usage"),
+            gpu_usage=redis_data.get("gpu_usage"),
+            mem_used=redis_data.get("mem_used"),
+            mem_total=redis_data.get("mem_total"),
+            temperature=redis_data.get("temperature"),
+            disk_used=redis_data.get("disk_used"),
+            disk_total=redis_data.get("disk_total"),
+            uptime=redis_data.get("uptime"),
+        )
+    else:
+        status_response = CameraStatusResponse(
+            is_online=False,
+            last_seen=None,
+            stream_running=False,
+        )
+
+    return CameraDetailResponse(
+        id=camera.id,
+        company_id=camera.company_id,
+        name=camera.name,
+        camera_key=camera.camera_key,
+        is_active=camera.is_active,
+        pending_command=camera.pending_command,
+        settings=camera.settings,
+        status=status_response,
+        created_at=camera.created_at,
+        updated_at=camera.updated_at,
+    )
 
 
 @router.put("/cameras/{camera_id}", response_model=CameraResponse)
