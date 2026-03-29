@@ -22,7 +22,6 @@ def poll_sync(
         "stream_running": req.stream_status.running,
         "stream_fps": req.stream_status.fps,
         "stream_bitrate": req.stream_status.bitrate,
-        "stream_time": req.stream_status.stream_time,
         "stream_quality": req.stream_status.stream_quality,
         "cpu_usage": req.system_status.cpu_usage,
         "gpu_usage": req.system_status.gpu_usage,

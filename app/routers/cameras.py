@@ -85,7 +85,7 @@ def get_camera(
             stream_running=redis_data.get("stream_running", False),
             stream_fps=redis_data.get("stream_fps"),
             stream_bitrate=redis_data.get("stream_bitrate"),
-            stream_time=redis_data.get("stream_time"),
+            stream_started_at=redis_data.get("stream_started_at"),
             stream_quality=redis_data.get("stream_quality"),
             cpu_usage=redis_data.get("cpu_usage"),
             gpu_usage=redis_data.get("gpu_usage"),

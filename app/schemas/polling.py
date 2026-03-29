@@ -7,7 +7,6 @@ class StreamStatus(BaseModel):
     height: int | None = None
     fps: float | None = None
     bitrate: int | None = None
-    stream_time: str | None = None
     stream_quality: str | None = None
 
 

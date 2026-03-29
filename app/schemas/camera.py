@@ -78,7 +78,7 @@ class CameraStatusResponse(BaseModel):
     stream_running: bool = False
     stream_fps: float | None = None
     stream_bitrate: int | None = None
-    stream_time: str | None = None
+    stream_started_at: datetime | None = None
     stream_quality: str | None = None
     cpu_usage: float | None = None
     gpu_usage: float | None = None

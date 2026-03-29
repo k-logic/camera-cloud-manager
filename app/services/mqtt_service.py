@@ -52,7 +52,6 @@ def _on_message(client, userdata, msg):
                 "stream_running": ss.get("running", False),
                 "stream_fps": ss.get("fps"),
                 "stream_bitrate": ss.get("bitrate"),
-                "stream_time": ss.get("stream_time"),
                 "stream_quality": ss.get("stream_quality"),
                 "cpu_usage": sys_s.get("cpu_usage"),
                 "gpu_usage": sys_s.get("gpu_usage"),

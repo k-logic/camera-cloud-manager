@@ -70,9 +70,9 @@ const CameraDetail = {
               <small class="text-muted d-block">FPS</small>
               <span>{{ camera.status.stream_fps != null ? camera.status.stream_fps : '-' }}</span>
             </div>
-            <div class="col-6 col-md-3" v-if="camera.status && camera.status.stream_running && camera.status.stream_time">
+            <div class="col-6 col-md-3" v-if="camera.status && camera.status.stream_running && camera.status.stream_started_at">
               <small class="text-muted d-block">Stream Time</small>
-              <span>{{ camera.status.stream_time }}</span>
+              <span>{{ streamElapsed }}</span>
             </div>
           </div>
           <div v-if="controlMsg" class="alert py-2" :class="controlMsgType === 'ok' ? 'alert-success' : 'alert-danger'">{{ controlMsg }}</div>
@@ -184,6 +184,15 @@ const CameraDetail = {
   `,
   computed: {
     isOnline() { return this.camera?.status?.is_online || false; },
+    streamElapsed() {
+      const started = this.camera?.status?.stream_started_at;
+      if (!started) return "-";
+      const elapsed = Math.max(0, Math.floor((this.nowTime - new Date(started).getTime()) / 1000));
+      const h = Math.floor(elapsed / 3600);
+      const m = Math.floor((elapsed % 3600) / 60);
+      const s = elapsed % 60;
+      return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    },
   },
   data() {
     return {
@@ -198,15 +207,19 @@ const CameraDetail = {
       editingName: false,
       editName: "",
       keyCopied: false,
+      nowTime: Date.now(),
       _pollTimer: null,
+      _clockTimer: null,
     };
   },
   async created() {
     await this.load();
     this._pollTimer = setInterval(() => this.refreshStatus(), 2000);
+    this._clockTimer = setInterval(() => { this.nowTime = Date.now(); }, 1000);
   },
   beforeUnmount() {
     if (this._pollTimer) clearInterval(this._pollTimer);
+    if (this._clockTimer) clearInterval(this._clockTimer);
   },
   methods: {
     async refreshStatus() {

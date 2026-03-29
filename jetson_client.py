@@ -111,18 +111,7 @@ def get_system_status():
     return call_api("GET", "/system/status")
 
 
-def format_stream_time(stream_start_time):
-    """配信経過時間をH:MM:SS形式で返す"""
-    if not stream_start_time:
-        return None
-    elapsed = int(time.time() - stream_start_time)
-    h = elapsed // 3600
-    m = (elapsed % 3600) // 60
-    s = elapsed % 60
-    return f"{h}:{m:02d}:{s:02d}"
-
-
-def build_cloud_status(settings_version, stream_st, system_st, stream_start_time=None):
+def build_cloud_status(settings_version, stream_st, system_st):
     """camera-api のレスポンスをクラウド向けフォーマットに変換"""
     # stream status 変換
     stream_status = {"running": False}
@@ -136,7 +125,6 @@ def build_cloud_status(settings_version, stream_st, system_st, stream_start_time
             "fps": stats.get("fps"),
             "bitrate": stats.get("bitrate_kbps"),
             "stream_quality": stats.get("status"),
-            "stream_time": format_stream_time(stream_start_time) if stream_st.get("running") else None,
         }
 
     # system status 変換
@@ -184,7 +172,6 @@ def main():
 
     settings_version = 0
     current_settings = {}
-    stream_start_time = None
 
     def on_connect(client, userdata, flags, reason_code, properties):
         print(f"[Jetson] Connected to broker: {reason_code}")
@@ -192,7 +179,7 @@ def main():
         client.subscribe(topic_command)
 
     def on_message(client, userdata, msg):
-        nonlocal settings_version, current_settings, stream_start_time
+        nonlocal settings_version, current_settings
 
         if msg.topic == topic_settings:
             if not msg.payload:
@@ -211,10 +198,8 @@ def main():
 
             if new_stream and not actually_running:
                 start_stream(data)
-                stream_start_time = time.time()
             elif not new_stream and actually_running:
                 stop_stream()
-                stream_start_time = None
             else:
                 print(f"[Jetson] Settings updated (v{settings_version})")
 
@@ -235,7 +220,7 @@ def main():
     def send_status(client):
         stream_st = get_stream_status()
         system_st = get_system_status()
-        payload = json.dumps(build_cloud_status(settings_version, stream_st, system_st, stream_start_time))
+        payload = json.dumps(build_cloud_status(settings_version, stream_st, system_st))
         client.publish(topic_status, payload)
 
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, transport="websockets")

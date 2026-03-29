@@ -19,7 +19,7 @@ def get_client() -> redis.Redis | None:
 
 
 def save_status(camera_id: int, data: dict):
-    """カメラステータスをRedisハッシュに保存（全項目）"""
+    """カメラス���ータスをRedis���ッシュに保存（全項目）"""
     if not _client:
         logger.warning("Redis client not available, skipping save_status")
         return
@@ -27,7 +27,17 @@ def save_status(camera_id: int, data: dict):
     # is_online/last_seenを自動付与
     data["is_online"] = "True"
     data["last_seen"] = datetime.now(timezone.utc).isoformat()
-    # 値をstrに変換（Redisハッシュはstr/bytes）
+    # stream_started_at: 配信中なら既存値を保持、なければ現在時刻をセ���ト
+    stream_running = str(data.get("stream_running", False)) == "True"
+    if stream_running:
+        existing = _client.hget(key, "stream_started_at")
+        if existing:
+            data["stream_started_at"] = existing.decode() if isinstance(existing, bytes) else existing
+        else:
+            data["stream_started_at"] = datetime.now(timezone.utc).isoformat()
+    else:
+        data["stream_started_at"] = ""
+    # 値をstrに変換（Redis��ッシュはstr/bytes）
     str_data = {k: str(v) if v is not None else "" for k, v in data.items()}
     _client.hset(key, mapping=str_data)
     _client.expire(key, STATUS_TTL)
@@ -61,8 +71,8 @@ def _convert_value(key: str, value: str):
 
     if key in bool_fields:
         return value == "True"
-    if key == "last_seen":
-        return value  # ISO文字列のまま返す
+    if key in ("last_seen", "stream_started_at"):
+        return value  # ISO文字列のまま返��
     if key in float_fields:
         try:
             return float(value)
