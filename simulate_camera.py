@@ -32,6 +32,7 @@ def main():
     stream_running = False
     settings_version = 0
     uptime = 0
+    stream_start_time = None
 
     def on_connect(client, userdata, flags, reason_code, properties):
         print(f"[Simulator] Connected to MQTT broker: {reason_code}")
@@ -39,6 +40,16 @@ def main():
         client.subscribe(topic_command)
         print(f"[Simulator] Subscribed to {topic_settings}")
         print(f"[Simulator] Subscribed to {topic_command}")
+
+    def format_stream_time():
+        """配信経過時間をH:MM:SS形式で返す"""
+        if not stream_start_time:
+            return None
+        elapsed = int(time.time() - stream_start_time)
+        h = elapsed // 3600
+        m = (elapsed % 3600) // 60
+        s = elapsed % 60
+        return f"{h}:{m:02d}:{s:02d}"
 
     def send_status_now():
         """即座にステータスを送信"""
@@ -56,6 +67,7 @@ def main():
                 "fps": round(random.uniform(29.5, 30.0), 2) if stream_running else None,
                 "bitrate": random.randint(3800, 4200) if stream_running else None,
                 "stream_quality": "good" if stream_running else None,
+                "stream_time": format_stream_time() if stream_running else None,
             },
             "system_status": {
                 "cpu_usage": cpu_usage, "gpu_usage": gpu_usage,
@@ -67,7 +79,7 @@ def main():
         client.publish(topic_status, payload)
 
     def on_message(client, userdata, msg):
-        nonlocal stream_running, settings_version, uptime
+        nonlocal stream_running, settings_version, uptime, stream_start_time
 
         if msg.topic == topic_settings:
             data = json.loads(msg.payload.decode())
@@ -78,6 +90,10 @@ def main():
             new_stream = data.get("stream_running", False)
             if new_stream != stream_running:
                 stream_running = new_stream
+                if stream_running:
+                    stream_start_time = time.time()
+                else:
+                    stream_start_time = None
                 action = "STARTED" if stream_running else "STOPPED"
                 print(f"[Simulator] Stream {action} (v{settings_version})")
             else:
@@ -129,6 +145,7 @@ def main():
                     "fps": round(random.uniform(29.5, 30.0), 2) if stream_running else None,
                     "bitrate": random.randint(3800, 4200) if stream_running else None,
                     "stream_quality": "good" if stream_running else None,
+                    "stream_time": format_stream_time() if stream_running else None,
                 },
                 "system_status": {
                     "cpu_usage": cpu_usage,
