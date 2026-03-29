@@ -102,6 +102,14 @@ def get_camera(
             last_seen=None,
             stream_running=False,
         )
+        # オフライン時にstream_running=Trueのままなら自動停止
+        # （再起動時にRetained Messageで即配信再開するのを防止）
+        if camera.settings and camera.settings.stream_running:
+            camera.settings.stream_running = False
+            camera.settings.settings_version += 1
+            db.commit()
+            db.refresh(camera.settings)
+            mqtt_service.publish_settings(camera.camera_key, camera.settings)
 
     return CameraDetailResponse(
         id=camera.id,
