@@ -138,7 +138,7 @@ DBテーブルではなくRedisハッシュで管理。キー: `camera_status:{c
 | stream_running | Boolean | Actual State（実際の配信状態） |
 | stream_fps | Float | 実際のFPS |
 | stream_bitrate | Integer | 実際のビットレート |
-| stream_time | String | 配信経過時間 |
+| stream_started_at | String(ISO) | 配信開始時刻（Redisで自動管理） |
 | stream_quality | String | "good" / "unstable" / "bad" |
 | cpu_usage, gpu_usage | Float | CPU/GPU使用率 |
 | mem_used, mem_total | Integer | メモリ (MB) |
@@ -150,6 +150,8 @@ DBテーブルではなくRedisハッシュで管理。キー: `camera_status:{c
 - カメラが停止 → 10秒後にキーが自動消滅 → APIは「オフライン」を返す
 - DBへの書き込みはゼロ（offline_checkerも不要）
 - カメラごとにキーが独立しているため、1台が切れても他に影響なし
+- `stream_started_at`はRedis内で自動管理（配信開始時にセット、停止でクリア）
+- 配信経過時間はフロントのJavaScriptで`stream_started_at`から毎秒計算（カメラ側は送らない）
 
 ### command_logs
 | カラム | 型 | 説明 |
@@ -211,6 +213,7 @@ DBテーブルではなくRedisハッシュで管理。キー: `camera_status:{c
 3. **ステータス報告**: camera-api → jetson_client.py → MQTT Publish → Redis保存（TTL 10秒）
 4. **再接続**: Retained Messageにより最新設定を即座に取得
 5. **オフライン検知**: Redis TTL切れ（10秒）でキー自動消滅 → APIが「オフライン」を返す
+6. **オフライン時自動停止**: カメラがオフライン + settings.stream_running=True → 自動的にFalseに更新 + Retained Message更新（APIポーリング時に検知）
 
 ## Jetson側構成
 
@@ -266,7 +269,7 @@ Jetson (<JETSON_HOST>)
 - 全企業・全カメラ管理
 - カメラ詳細:
   - **Camera Info**: カメラ名（ダブルクリック編集）、Camera Key（コピーボタン）、Connection（Online/Offline）、作成日
-  - **Stream Control**: Desired State、Actual State、Start/Stopボタン
+  - **Stream Control**: Desired State、Actual State、Bitrate、FPS、Stream Time（配信中のみ）、Start/Stopボタン
   - **Stream Settings**: Camera Input（HD/FHD/4K）、Output Resolution、FPS（30/60）、Bitrate、Stream URL（変更時自動保存）
   - **Device Status**: CPU/GPU/メモリ/温度/ディスク/Uptime
 - 2秒間隔で自動更新
@@ -288,7 +291,8 @@ Jetson (<JETSON_HOST>)
 - **Desired State** (camera_settings.stream_running): 管理者が設定した「あるべき状態」
 - **Actual State** (camera_status.stream_running): カメラから報告される「実際の状態」
 - エラー時: Desired=Running, Actual=Stopped → 異常と判断可能
-- settings_versionで差分検知、Retained Messageで再接続時の自動復旧
+- settings_versionで差分検知、Retained Messageで再接続時の設定自動同期
+- **オフライン時自動停止**: カメラがオフラインになると自動的にstream_running=Falseに更新 + Retained Message更新 → 再起動時に配信が自動再開しない（手動Startが必要）
 
 ## 起動方法
 
@@ -346,6 +350,7 @@ allow_anonymous true
 | Phase 5 | MQTT移行 + Jetson実機接続 | ✅ |
 | Phase 6 | Bootstrap 5 UIリニューアル + 本番デプロイ | ✅ |
 | Phase 7 | Redis移行（ステータス全てRedis、CameraStatusテーブル廃止） | ✅ |
+| Phase 8 | Stream Control強化（Bitrate/FPS/経過時間表示、オフライン時自動停止） | ✅ |
 
 ## 今後のロードマップ
 

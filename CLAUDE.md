@@ -74,8 +74,10 @@ ssh logic-jetson "sudo systemctl restart jetson-client"
 
 ### Redis（リアルタイムステータス）
 - `camera_status:{camera_id}`: ハッシュ型、TTL 10秒
-- 項目: is_online, last_seen, stream_running, stream_fps, stream_bitrate, stream_time, stream_quality, cpu_usage, gpu_usage, mem_used, mem_total, temperature, disk_used, disk_total, uptime
+- 項目: is_online, last_seen, stream_running, stream_started_at, stream_fps, stream_bitrate, stream_quality, cpu_usage, gpu_usage, mem_used, mem_total, temperature, disk_used, disk_total, uptime
+- `stream_started_at`: 配信開始時刻（Redisで自動管理、フロントで経過時間を毎秒計算）
 - TTL切れ = オフライン（offline_checkerは不要）
+- オフライン時自動停止: カメラオフライン検知 → stream_running=False + Retained Message更新 → 再起動時に配信自動再開しない
 - CameraStatusテーブルは廃止済み（camera_statusテーブルはマイグレーションで作成されるがアプリでは使わない）
 
 ## MQTT設計
@@ -125,6 +127,7 @@ ssh logic-jetson "sudo systemctl restart jetson-client"
 - Phase 5: MQTT移行 + Jetson実機接続 ✅
 - Phase 6: Bootstrap 5 UIリニューアル + 本番デプロイ ✅
 - Phase 7: Redis移行（ステータス全てRedis、DB書き込みゼロ） ✅
+- Phase 8: Stream Control強化（Bitrate/FPS/経過時間表示、オフライン時自動停止） ✅
 
 ## 本番デプロイ
 ```bash
