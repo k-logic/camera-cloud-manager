@@ -62,6 +62,18 @@ const CameraDetail = {
               </span>
               <span v-else class="badge bg-secondary">Unknown</span>
             </div>
+            <div class="col-6 col-md-3" v-if="camera.status && camera.status.stream_running">
+              <small class="text-muted d-block">Bitrate</small>
+              <span>{{ camera.status.stream_bitrate ? camera.status.stream_bitrate + ' kbps' : '-' }}</span>
+            </div>
+            <div class="col-6 col-md-3" v-if="camera.status && camera.status.stream_running">
+              <small class="text-muted d-block">FPS</small>
+              <span>{{ camera.status.stream_fps != null ? camera.status.stream_fps : '-' }}</span>
+            </div>
+            <div class="col-6 col-md-3" v-if="camera.status && camera.status.stream_running && camera.status.stream_time">
+              <small class="text-muted d-block">Stream Time</small>
+              <span>{{ camera.status.stream_time }}</span>
+            </div>
           </div>
           <div v-if="controlMsg" class="alert py-2" :class="controlMsgType === 'ok' ? 'alert-success' : 'alert-danger'">{{ controlMsg }}</div>
           <div class="d-flex gap-2 flex-wrap">
