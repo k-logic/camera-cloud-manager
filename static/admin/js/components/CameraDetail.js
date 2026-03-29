@@ -65,7 +65,7 @@ const CameraDetail = {
           </div>
           <div v-if="controlMsg" class="alert py-2" :class="controlMsgType === 'ok' ? 'alert-success' : 'alert-danger'">{{ controlMsg }}</div>
           <div class="d-flex gap-2 flex-wrap">
-            <button class="btn btn-success btn-sm" @click="streamControl(true)" :disabled="settings.stream_running">
+            <button class="btn btn-success btn-sm" @click="streamControl(true)" :disabled="settings.stream_running || !isOnline">
               <i class="bi bi-play-fill me-1"></i>Start
             </button>
             <button class="btn btn-secondary btn-sm" @click="streamControl(false)" :disabled="!settings.stream_running">
@@ -170,6 +170,9 @@ const CameraDetail = {
     </div>
     <div v-else class="card"><div class="card-body">Loading...</div></div>
   `,
+  computed: {
+    isOnline() { return this.camera?.status?.is_online || false; },
+  },
   data() {
     return {
       camera: null,
