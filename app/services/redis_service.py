@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 _client: redis.Redis | None = None
 
-STATUS_TTL = 30  # 秒（ポーリング間隔2秒に対して十分な余裕。TTL切れ=オフライン）
+STATUS_TTL = 10  # 秒（ポーリング間隔2秒に対して十分な余裕。TTL切れ=オフライン）
 KEY_PREFIX = "camera_status:"
 
 
