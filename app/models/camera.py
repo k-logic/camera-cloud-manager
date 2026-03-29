@@ -63,8 +63,6 @@ class CameraStatus(Base):
     is_online: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     last_seen: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     stream_running: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    stream_width: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    stream_height: Mapped[int | None] = mapped_column(Integer, nullable=True)
     stream_fps: Mapped[float | None] = mapped_column(Float, nullable=True)
     stream_bitrate: Mapped[int | None] = mapped_column(Integer, nullable=True)
     stream_time: Mapped[str | None] = mapped_column(String(20), nullable=True)

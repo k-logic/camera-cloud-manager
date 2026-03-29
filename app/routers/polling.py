@@ -28,8 +28,6 @@ def poll_sync(
     camera_status.is_online = True
     camera_status.last_seen = now
     camera_status.stream_running = req.stream_status.running
-    camera_status.stream_width = req.stream_status.width
-    camera_status.stream_height = req.stream_status.height
     camera_status.stream_fps = req.stream_status.fps
     camera_status.stream_bitrate = req.stream_status.bitrate
     camera_status.stream_time = req.stream_status.stream_time

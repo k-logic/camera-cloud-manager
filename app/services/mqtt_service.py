@@ -60,8 +60,6 @@ def _on_message(client, userdata, msg):
             # stream_status
             ss = data.get("stream_status", {})
             status.stream_running = ss.get("running", False)
-            status.stream_width = ss.get("width")
-            status.stream_height = ss.get("height")
             status.stream_fps = ss.get("fps")
             status.stream_bitrate = ss.get("bitrate")
             status.stream_time = ss.get("stream_time")

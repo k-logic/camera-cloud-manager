@@ -76,8 +76,6 @@ class CameraStatusResponse(BaseModel):
     is_online: bool
     last_seen: datetime | None
     stream_running: bool
-    stream_width: int | None
-    stream_height: int | None
     stream_fps: float | None
     stream_bitrate: int | None
     stream_time: str | None

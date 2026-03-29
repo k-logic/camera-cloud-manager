@@ -133,7 +133,6 @@ cloud-manager/
 | is_online | Boolean | オンライン状態 |
 | last_seen | DateTime | 最終通信時刻 |
 | stream_running | Boolean | Actual State（実際の配信状態） |
-| stream_width, stream_height | Integer | 実際の配信解像度 |
 | stream_fps | Float | 実際のFPS |
 | stream_bitrate | Integer | 実際のビットレート |
 | stream_time | String | 配信経過時間 |
