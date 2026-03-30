@@ -44,6 +44,9 @@ class CameraSettingsUpdate(BaseModel):
     output_height: int | None = None
     fps: int | None = None
     bitrate: int | None = None
+    audio_bitrate: str | None = None
+    audio_sample_rate: int | None = None
+    audio_channels: int | None = None
     stream_url: str | None = None
     stream_running: bool | None = None
 
@@ -63,6 +66,9 @@ class CameraSettingsResponse(BaseModel):
     output_height: int
     fps: int
     bitrate: int
+    audio_bitrate: str
+    audio_sample_rate: int
+    audio_channels: int
     stream_url: str | None
     stream_running: bool
     settings_version: int

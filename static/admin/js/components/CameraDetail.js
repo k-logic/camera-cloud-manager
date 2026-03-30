@@ -121,6 +121,31 @@ const CameraDetail = {
               <input v-model.number="settingsForm.bitrate" type="number" min="800" max="50000" @change="saveSettings" class="form-control form-control-sm">
             </div>
           </div>
+          <div class="row g-3 mb-3">
+            <div class="col-sm-6 col-md-3">
+              <label class="form-label">Audio Bitrate</label>
+              <select v-model="settingsForm.audio_bitrate" @change="saveSettings" class="form-select form-select-sm">
+                <option value="64k">64k</option>
+                <option value="128k">128k</option>
+                <option value="192k">192k</option>
+                <option value="256k">256k</option>
+              </select>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <label class="form-label">Sample Rate</label>
+              <select v-model.number="settingsForm.audio_sample_rate" @change="saveSettings" class="form-select form-select-sm">
+                <option :value="44100">44100 Hz</option>
+                <option :value="48000">48000 Hz</option>
+              </select>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <label class="form-label">Channels</label>
+              <select v-model.number="settingsForm.audio_channels" @change="saveSettings" class="form-select form-select-sm">
+                <option :value="1">1 (Mono)</option>
+                <option :value="2">2 (Stereo)</option>
+              </select>
+            </div>
+          </div>
           <div class="mb-3">
             <label class="form-label">Stream URL</label>
             <input v-model="settingsForm.stream_url" type="text" placeholder="rtmp://..." @change="saveSettings" class="form-control form-control-sm">
@@ -199,7 +224,7 @@ const CameraDetail = {
       camera: null,
       notFound: false,
       settings: {},
-      settingsForm: { camera_source: "mipi", capture_resolution: "1920x1080", output_resolution: "1920x1080", fps: 30, bitrate: 4000, stream_url: "" },
+      settingsForm: { camera_source: "mipi", capture_resolution: "1920x1080", output_resolution: "1920x1080", fps: 30, bitrate: 4000, audio_bitrate: "128k", audio_sample_rate: 44100, audio_channels: 1, stream_url: "" },
       settingsMsg: null,
       settingsMsgType: "ok",
       controlMsg: null,
@@ -265,6 +290,9 @@ const CameraDetail = {
             output_resolution: `${this.settings.output_width}x${this.settings.output_height}`,
             fps: this.settings.fps,
             bitrate: this.settings.bitrate,
+            audio_bitrate: this.settings.audio_bitrate || "128k",
+            audio_sample_rate: this.settings.audio_sample_rate || 44100,
+            audio_channels: this.settings.audio_channels || 1,
             stream_url: this.settings.stream_url || "",
           };
         }
@@ -301,6 +329,9 @@ const CameraDetail = {
         output_height: oh,
         fps: this.settingsForm.fps,
         bitrate: this.settingsForm.bitrate,
+        audio_bitrate: this.settingsForm.audio_bitrate,
+        audio_sample_rate: this.settingsForm.audio_sample_rate,
+        audio_channels: this.settingsForm.audio_channels,
         stream_url: this.settingsForm.stream_url || null,
       };
       const res = await apiFetch(`/api/cameras/${this.$route.params.id}/settings`, {

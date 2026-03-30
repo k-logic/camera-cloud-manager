@@ -199,7 +199,7 @@ def update_camera_settings(
         raise HTTPException(status_code=404, detail="Settings not found")
 
     updated = False
-    for field in ["camera_source", "width", "height", "output_width", "output_height", "fps", "bitrate", "stream_url"]:
+    for field in ["camera_source", "width", "height", "output_width", "output_height", "fps", "bitrate", "audio_bitrate", "audio_sample_rate", "audio_channels", "stream_url"]:
         val = getattr(req, field)
         if val is not None:
             setattr(settings, field, val)
