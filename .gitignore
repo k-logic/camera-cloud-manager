@@ -3,6 +3,7 @@
 .DS_Store
 .claude/
 docker-compose.yml
+.env.prod
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
